@@ -2,6 +2,13 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <stddint.h>
+
+typedef byte_t uint8_t;
+typedef addr_t uint16_t;
+
+#define ADDRSPACE_SIZE (1<<16)
+
 // Operands
 #define OP_A   0b111
 #define OP_B   0b000
@@ -21,6 +28,7 @@
 // Mask out operand from instruction
 #define LOW_OP_MASK  0b11111000
 #define HIGH_OP_MASK 0b11000111
+#define BOTH_OP_MASK 0b11000000
 
 // Masked with LOW_OP_MASK
 #define INSTRBITS_ADD 0b10000000
@@ -38,12 +46,15 @@
 #define INSTRBITS_DCR 0b00000101
 #define INSTRBITS_RST 0b11000111
 
+// Masked with BOTH_OP_MASK
+#define INSTRBITS_MOV 0b01000000
+
 // Unambigous instructions
-enum instr_t
+enum instr
 {
 #define MACRO(i, c) INSTR_##i = c,
 #include "instr_raw.h"
 #undef MACRO
-}
+};
 
 #endif
