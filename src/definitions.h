@@ -19,11 +19,31 @@ typedef addr_t uint16_t;
 #define OP_L   0b101
 #define OP_MEM 0b110
 
+typedef enum
+{
+    FLAG_Z,
+    FLAG_S,
+    FLAG_P,
+    FLAG_CY,
+    FLAG_AC
+};
+
+#define BIT(b) (1 << (x))
+#define GETBIT(x, b) (((x) & BIT(b)) >> b)
+#define SETBIT(x, b) ((x) | BIT(b))
+#define UNSETBIT(x, b) ((x) & ~BIT(b))
+
 // Extract the first operand of an instruction
 #define OP_1(x) (((x) >> 3) & 7)
 
 // Extract the second operand of an instruction
 #define OP_2(x) ((x) & 7)
+
+// Get/set low/high bytes of 16-bit word
+#define SETH(x, b) (((x) & 0xff) | ((b) << 8))
+#define SETL(x, b) (((x) & 0xff00) | (b))
+#define GETH(x) (((x) >> 8) & 0xff)
+#define GETL(x) ((x) & 0xff)
 
 // Mask out operand from instruction
 #define LOW_OP_MASK  0b11111000
