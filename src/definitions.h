@@ -2,15 +2,16 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#include <stddint.h>
+#include <stdint.h>
 
-typedef byte_t uint8_t;
-typedef addr_t uint16_t;
+typedef uint8_t byte_t ;
+typedef uint16_t addr_t;
 
 #define ADDRSPACE_SIZE (1<<16)
 
 // Operands
 #define OP_A   0b111
+#define OP_F   0b1000
 #define OP_B   0b000
 #define OP_C   0b001
 #define OP_D   0b010
@@ -26,9 +27,9 @@ typedef enum
     FLAG_P,
     FLAG_CY,
     FLAG_AC
-};
+} flag_t;
 
-#define BIT(b) (1 << (x))
+#define BIT(b) (1 << (b))
 #define GETBIT(x, b) (((x) & BIT(b)) >> b)
 #define SETBIT(x, b) ((x) | BIT(b))
 #define UNSETBIT(x, b) ((x) & ~BIT(b))

@@ -1,10 +1,14 @@
 
 #include "cpu.h"
 #include "definitions.h"
+#include "mem.h"
+#include "assert.h"
+
+cpu_t cpu;
 
 byte_t get_code()
 {
-    const byte_t code = sys.mem[cpu.pc];
+    const byte_t code = mem[cpu.pc];
     cpu.pc++;
     return code;
 }
@@ -21,6 +25,7 @@ byte_t *reg_ptr(byte_t op)
         case OP_E: return &cpu.e;
         case OP_H: return &cpu.h;
         case OP_L: return &cpu.l;
+        default:   assert(0 && "undefined register");
     }
 }
 
@@ -45,6 +50,7 @@ addr_t pop16()
     addr_t data = 0;
     data = SETL(data, pop8());
     data = SETH(data, pop8());
+    return data;
 }
 
 // returns what A register should be
@@ -74,6 +80,7 @@ void op_write(byte_t op, byte_t data)
         case OP_H: cpu.h = data; break;
         case OP_L: cpu.l = data; break;
         case OP_MEM: mem_write(cpu.hl, data); break;
+        default: assert(0 && "undefined operand");
     }
 }
 
@@ -90,12 +97,14 @@ byte_t op_read(byte_t op)
         case OP_H: return cpu.h;
         case OP_L: return cpu.l;
         case OP_MEM: return mem_read(cpu.hl);
+        default: assert(0 && "undefined operand"); return 0;
     }
 }
 
 void cpu_exec()
 {
     const byte_t code = get_code();
+    int r;
 
     switch (code)
     {
@@ -105,22 +114,22 @@ void cpu_exec()
     {
         // Add
         case INSTRBITS_ADD:
-            int r = (int)cpu.a + (int)op_read(OP_2(code));
+            r = (int)cpu.a + (int)op_read(OP_2(code));
             cpu.a = setflags(r);
             break;
         // Add with carry
         case INSTRBITS_ADC:
-            int r = (int)cpu.a + (int)op_read(OP_2(code)) + (int)GETBIT(cpu.f, FLAG_CY);
+            r = (int)cpu.a + (int)op_read(OP_2(code)) + (int)GETBIT(cpu.f, FLAG_CY);
             cpu.a = setflags(r);
             break;
         // Subtract
         case INSTRBITS_SUB:
-            int r = (int)cpu.a - (int)op_read(OP_2(code));
+            r = (int)cpu.a - (int)op_read(OP_2(code));
             cpu.a = setflags(r);
             break;
         // Subtract with borrow
         case INSTRBITS_SBB:
-            int r = (int)cpu.a - (int)op_read(OP_2(code)) - (int)GETBIT(cpu.f, FLAG_CY);
+            r = (int)cpu.a - (int)op_read(OP_2(code)) - (int)GETBIT(cpu.f, FLAG_CY);
             cpu.a = setflags(r);
             break;
         // AND
@@ -135,14 +144,14 @@ void cpu_exec()
             cpu.f = UNSETBIT(cpu.f, BIT(FLAG_AC));
             break;
         // XOR
-        case INSTRBITS_ORA:
+        case INSTRBITS_XRA:
             cpu.a ^= op_read(OP_2(code));
             cpu.f = UNSETBIT(cpu.f, BIT(FLAG_CY));
             cpu.f = UNSETBIT(cpu.f, BIT(FLAG_AC));
             break;
         // Compare
         case INSTRBITS_CMP:
-            int r = (int)cpu.a - (int)op_read(OP_2(code));
+            r = (int)cpu.a - (int)op_read(OP_2(code));
             setflags(r);
             break;
     }
@@ -151,11 +160,11 @@ void cpu_exec()
     {
         // Increment
         case INSTRBITS_INR:
-            *reg_ptr(OP_1(code))++;
+            (*reg_ptr(OP_1(code)))++;
             break;
         // Decrement
         case INSTRBITS_DCR:
-            *reg_ptr(OP_1(code))--;
+            (*reg_ptr(OP_1(code)))--;
             break;
         // Reset
         case INSTRBITS_RST:

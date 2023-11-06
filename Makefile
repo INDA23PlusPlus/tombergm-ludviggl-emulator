@@ -5,11 +5,11 @@ SRC=$(wildcard src/*.c)
 OUTPUT=build/8080
 
 default: $(SRC)
-    mkdir -p build
-    $(CC) $(CFLAGS) $(SRC) -o $(OUTPUT)
+	mkdir -p build
+	$(CC) $(CFLAGS) $(SRC) -o $(OUTPUT)
 
 .PHONY:
-    clean
+	clean
 
 clean:
-    rm -rf build
+	rm -rf build

@@ -27,7 +27,7 @@ typedef struct {
             byte_t d;
             byte_t e;
         };
-        addr_t de
+        addr_t de;
  ;
     };
 
@@ -36,7 +36,7 @@ typedef struct {
             byte_t h;
             byte_t l;
         };
-        addr_t hl
+        addr_t hl;
     };
 
     addr_t pc;

@@ -1,6 +1,7 @@
 
 #include "mem.h"
-#include "stdio.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
@@ -21,4 +22,5 @@ int main(int argc, char *argv[])
     }
 
     const size_t fsize = fread(mem, sizeof(mem), 1, f);
+    (void)fsize;
 }
