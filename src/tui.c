@@ -1,8 +1,10 @@
 
 #include "tui.h"
+#include "io.h"
 #include "cpu.h"
 #include "definitions.h"
 #include "mem.h"
+#include "buffer.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -22,6 +24,10 @@ void tui_update(void)
 
     printf("\033[2J");
 
+    io_dump();
+
+    printf("\n------------------------------------------------\n");
+
     printf(
             "Registers:\n"
             "             S   Z   AC   P   CY\n"
@@ -40,11 +46,6 @@ void tui_update(void)
     );
 
     prev = cpu;
-
-    int start = tui_addr & 0xfff0;
-    start -= 8 * MEM_ROWS;
-    if (start < 0) start = 0;
-    if (start >= ADDRSPACE_SIZE) start = ADDRSPACE_SIZE - 16 * MEM_ROWS;
 
     printf("Last write:\n");
     hexdump(tui_addr);

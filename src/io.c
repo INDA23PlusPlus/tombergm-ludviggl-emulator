@@ -1,5 +1,8 @@
 #include "io.h"
+#include "buffer.h"
 #include <stdio.h>
+
+static buf_t buf = { 0 };
 
 byte_t io_read(byte_t port)
 {
@@ -10,5 +13,10 @@ byte_t io_read(byte_t port)
 void io_write(byte_t port, byte_t data)
 {
     (void)port;
-    putc(data, stdin);
+    buf_putc(&buf, data);
+}
+
+void io_dump()
+{
+    buf_print(&buf);
 }
