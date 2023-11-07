@@ -26,11 +26,27 @@ int main(int argc, char *argv[])
     const size_t fsize = fread(mem, sizeof(mem), 1, f);
     (void)fsize;
 
-    while (!cpu.halt)
+    for (;;)
     {
         tui_update();
-        printf("Press ENTER to step, or type 'q' to quit.\n");
-        if (getc(stdin) == 'q') break;
-        cpu_step();
+        printf("Press ENTER to step, or type 'c' to run, 'q' to quit.\n");
+        char c = fgetc(stdin);
+        if (c == 'q')
+        {
+            break;
+        }
+        else if (c == 'c')
+        {
+            while (!cpu.halt)
+            {
+                cpu_step();
+            }
+        }
+        else
+        {
+            cpu_step();
+        }
     }
+
+    tui_update();
 }
