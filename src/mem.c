@@ -1,4 +1,3 @@
-
 #include "mem.h"
 
 byte_t mem[ADDRSPACE_SIZE];

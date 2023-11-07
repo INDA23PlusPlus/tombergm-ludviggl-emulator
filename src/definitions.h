@@ -1,4 +1,3 @@
-
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
@@ -73,9 +72,9 @@ typedef enum
 // Unambigous instructions
 enum instr
 {
-#define MACRO(i, c) INSTR_##i = c,
+#define DEF(i, c) INSTR_##i = c,
 #include "instr_raw.h"
-#undef MACRO
+#undef DEF
 };
 
 #endif
