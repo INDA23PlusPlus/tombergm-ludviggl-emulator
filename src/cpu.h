@@ -10,51 +10,14 @@ typedef struct {
         addr_t addr_reg[4];
 
         struct {
-            union {
-                struct {
-                    byte_t b;
-                    byte_t c;
-                };
-                addr_t bc;
-            };
-
-            union {
-                struct {
-                    byte_t d;
-                    byte_t e;
-                };
-                addr_t de;
-            };
-
-            union {
-                struct {
-                    byte_t h;
-                    byte_t l;
-                };
-                addr_t hl;
-            };
-
-            union {
-                struct {
-                    byte_t a;
-                    union
-                    {
-                        byte_t f;
-                        struct
-                        {
-                            byte_t s  : 1;
-                            byte_t z  : 1;
-                            byte_t    : 1;
-                            byte_t ac : 1;
-                            byte_t    : 1;
-                            byte_t p  : 1;
-                            byte_t    : 1;
-                            byte_t cy : 1;
-                        };
-                    };
-                };
-                addr_t af;
-            };
+            byte_t b;
+            byte_t c;
+            byte_t d;
+            byte_t e;
+            byte_t h;
+            byte_t l;
+            byte_t a;
+            byte_t f;
         };
     };
 

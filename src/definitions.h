@@ -29,9 +29,8 @@ typedef enum
 } flag_t;
 
 #define BIT(b) (1 << (b))
-#define GETBIT(x, b) (((x) & BIT(b)) >> b)
-#define SETBIT(x, b) ((x) | BIT(b))
-#define UNSETBIT(x, b) ((x) & ~BIT(b))
+#define GETBIT(x, b) (((x) >> b) & 1)
+#define SETBIT(x, b, v) (((x) & ~BIT(b)) | ((v) << b))
 
 // Extract the first operand of an instruction
 #define OP_1(x) (((x) >> 3) & 7)
@@ -44,6 +43,7 @@ typedef enum
 #define SETL(x, b) (((x) & 0xff00) | (b))
 #define GETH(x) (((x) >> 8) & 0xff)
 #define GETL(x) ((x) & 0xff)
+#define COMPHL(h, l) (((h) << 8) & (l))
 
 // Mask out operand from instruction
 #define LOW_OP_MASK  0b11111000

@@ -32,25 +32,24 @@ static void push16(addr_t data)
 
 static addr_t pop16(void)
 {
-    addr_t data = 0;
-    data = SETL(data, pop8());
-    data = SETH(data, pop8());
-    return data;
+    const byte_t l = pop8();
+    const byte_t h = pop8();
+    return COMPHL(h, l);
 }
 
 // returns what A register should be
 static unsigned setflags(unsigned result)
 {
-    cpu.z = (result == 0);
-    cpu.s = (result > 0x7F);
+    cpu.f = SETBIT(cpu.f, FLAG_Z, result == 0);
+    cpu.f = SETBIT(cpu.f, FLAG_S, result > 0x7F);
     {
         unsigned p = result;
         p = (p >> 4) ^ p;
         p = (p >> 2) ^ p;
         p = (p >> 1) ^ p;
-        cpu.p = p ^ 1;
+        cpu.f = SETBIT(cpu.f, FLAG_P, p ^ 1);
     }
-    cpu.cy = (result > 0xFF);
+    cpu.f = SETBIT(cpu.f, FLAG_CY, result > 0xFF);
     return result;
 }
 
@@ -58,14 +57,17 @@ static unsigned setflags_sum(unsigned a, unsigned b)
 {
     unsigned result = a + b;
     setflags(result);
-    cpu.ac = (((a & 0xF) + (b & 0xF)) >> 4);
+    cpu.f = SETBIT(cpu.f, FLAG_AC, ((a & 0xF) + (b & 0xF)) >> 4);
     return result;
 }
 
 static void op_write(byte_t op, byte_t data)
 {
     if (op == OP_MEM)
-        mem_write(cpu.hl, data);
+    {
+        addr_t addr = COMPHL(cpu.h, cpu.l);
+        mem_write(addr, data);
+    }
     else
         BYTE_REG(op) = data;
 }
@@ -73,7 +75,10 @@ static void op_write(byte_t op, byte_t data)
 static byte_t op_read(byte_t op)
 {
     if (op == OP_MEM)
-        return mem_read(cpu.hl);
+    {
+        addr_t addr = COMPHL(cpu.h, cpu.l);
+        return mem_read(addr);
+    }
     else
         return BYTE_REG(op);
 }
@@ -94,7 +99,7 @@ void cpu_step(void)
             return;
         // Add Immediate To Accumulator With Carry
         case INSTR_ACI:
-            cpu.a = setflags_sum(cpu.a, get_code() + cpu.cy);
+            cpu.a = setflags_sum(cpu.a, get_code() + GETBIT(cpu.f, FLAG_CY));
             return;
         // Subtract Immediate From Accumulator
         case INSTR_SUI:
@@ -102,7 +107,7 @@ void cpu_step(void)
             return;
         // Subtract Immediate From Accumulator With Borrow
         case INSTR_SBI:
-            cpu.a = setflags_sum(cpu.a, -get_code() - cpu.cy);
+            cpu.a = setflags_sum(cpu.a, -get_code() - GETBIT(cpu.f, FLAG_CY));
             return;
         // And Immediate With Accumulator
         case INSTR_ANI:
@@ -122,22 +127,22 @@ void cpu_step(void)
             return;
         // Rotate Accumulator Left
         case INSTR_RLC:
-            cpu.cy = (cpu.a > 0x7F);
+            cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a > 0x7F);
             // Fall-thru
         // Rotate Accumulator Left Through Carry
         case INSTR_RAL:
-            r = ((cpu.a << 1) | cpu.cy);
-            cpu.cy = (cpu.a > 0x7F);
+            r = ((cpu.a << 1) | GETBIT(cpu.f, FLAG_CY));
+            cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a > 0x7F);
             cpu.a = r;
             return;
         // Rotate Accumulator Right
         case INSTR_RRC:
-            cpu.cy = (cpu.a & 1);
+            cpu.f = SETBIT(cpu.f, FLAG_CY, (cpu.a & 1));
             // Fall-thru
         // Rotate Accumulator Right Through Carry
         case INSTR_RAR:
-            r = ((cpu.a >> 1) | (cpu.cy << 7));
-            cpu.cy = (cpu.a & 1);
+            r = ((cpu.a >> 1) | (GETBIT(cpu.f, FLAG_CY) << 7));
+            cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a & 1);
             cpu.a = r;
             return;
         // JUMP
@@ -150,56 +155,56 @@ void cpu_step(void)
         case INSTR_JC:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.cy)
+            if (GETBIT(cpu.f, FLAG_CY))
                 cpu.pc = r;
             return;
         // Jump If No Carry
         case INSTR_JNC:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.cy)
+            if (!GETBIT(cpu.f, FLAG_CY))
                 cpu.pc = r;
             return;
         // Jump If Zero
         case INSTR_JZ:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.z)
+            if (GETBIT(cpu.f, FLAG_Z))
                 cpu.pc = r;
             return;
         // Jump If Not Zero
         case INSTR_JNZ:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.z)
+            if (!GETBIT(cpu.f, FLAG_Z))
                 cpu.pc = r;
             return;
         // Jump If Minus
         case INSTR_JM:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.s)
+            if (GETBIT(cpu.f, FLAG_S))
                 cpu.pc = r;
             return;
          // Jump If Positive
         case INSTR_JP:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.s)
+            if (!GETBIT(cpu.f, FLAG_S))
                 cpu.pc = r;
             return;
        // Jump If Parity Even
         case INSTR_JPE:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.p)
+            if (GETBIT(cpu.f, FLAG_P))
                 cpu.pc = r;
             return;
         // Jump If Parity Odd
         case INSTR_JPO:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.p)
+            if (!GETBIT(cpu.f, FLAG_P))
                 cpu.pc = r;
             return;
         // Call
@@ -213,7 +218,7 @@ void cpu_step(void)
         case INSTR_CC:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.cy)
+            if (GETBIT(cpu.f, FLAG_CY))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -223,7 +228,7 @@ void cpu_step(void)
         case INSTR_CNC:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.cy)
+            if (!GETBIT(cpu.f, FLAG_CY))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -233,7 +238,7 @@ void cpu_step(void)
         case INSTR_CZ:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.z)
+            if (GETBIT(cpu.f, FLAG_Z))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -243,7 +248,7 @@ void cpu_step(void)
         case INSTR_CNZ:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.z)
+            if (!GETBIT(cpu.f, FLAG_Z))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -253,7 +258,7 @@ void cpu_step(void)
         case INSTR_CM:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.s)
+            if (GETBIT(cpu.f, FLAG_S))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -263,7 +268,7 @@ void cpu_step(void)
         case INSTR_CP:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.s)
+            if (!GETBIT(cpu.f, FLAG_S))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -273,7 +278,7 @@ void cpu_step(void)
         case INSTR_CPE:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (cpu.p)
+            if (GETBIT(cpu.f, FLAG_P))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -283,7 +288,7 @@ void cpu_step(void)
         case INSTR_CPO:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
-            if (!cpu.p)
+            if (!GETBIT(cpu.f, FLAG_P))
             {
                 push16(cpu.pc);
                 cpu.pc = r;
@@ -295,42 +300,42 @@ void cpu_step(void)
             return;
         // Return If Carry
         case INSTR_RC:
-            if (cpu.cy)
+            if (GETBIT(cpu.f, FLAG_CY))
                 cpu.pc = pop16();
             return;
         // Return If No Carry
         case INSTR_RNC:
-            if (!cpu.cy)
+            if (!GETBIT(cpu.f, FLAG_CY))
                 cpu.pc = pop16();
             return;
         // Return If Zero
         case INSTR_RZ:
-            if (cpu.z)
+            if (GETBIT(cpu.f, FLAG_Z))
                 cpu.pc = pop16();
             return;
         // Return If Not Zero
         case INSTR_RNZ:
-            if (!cpu.z)
+            if (!GETBIT(cpu.f, FLAG_Z))
                 cpu.pc = pop16();
             return;
         // Return If Minus
         case INSTR_RM:
-            if (cpu.s)
+            if (GETBIT(cpu.f, FLAG_S))
                 cpu.pc = pop16();
             return;
          // Return If Plus
         case INSTR_RP:
-            if (!cpu.s)
+            if (!GETBIT(cpu.f, FLAG_S))
                 cpu.pc = pop16();
             return;
         // Return If Parity Even
         case INSTR_RPE:
-            if (cpu.p)
+            if (GETBIT(cpu.f, FLAG_P))
                 cpu.pc = pop16();
             return;
         // Return If Parity Odd
         case INSTR_RPO:
-            if (!cpu.p)
+            if (!GETBIT(cpu.f, FLAG_P))
                 cpu.pc = pop16();
             return;
         // Input
@@ -343,18 +348,18 @@ void cpu_step(void)
             return;
         // Load Immediate Into Register Pair (b,c)
         case INSTR_LXIB:
-            cpu.bc = SETL(cpu.bc, get_code());
-            cpu.bc = SETH(cpu.bc, get_code());
+            cpu.c = get_code();
+            cpu.b = get_code();
             return;
         // Load Immediate Into Register Pair (d,e)
         case INSTR_LXID:
-            cpu.de = SETL(cpu.de, get_code());
-            cpu.de = SETH(cpu.de, get_code());
+            cpu.e = get_code();
+            cpu.d = get_code();
             return;
         // Load Immediate Into Register Pair (hl)
         case INSTR_LXIH:
-            cpu.hl = SETL(cpu.hl, get_code());
-            cpu.hl = SETH(cpu.hl, get_code());
+            cpu.l = get_code();
+            cpu.h = get_code();
             return;
         // Load Immediate Into Register Pair (sp)
         case INSTR_LXISP:
@@ -363,35 +368,43 @@ void cpu_step(void)
             return;
          // Push Data Onto Stack (b,c)
         case INSTR_PUSHB:
-            push16(cpu.bc);
+            push8(cpu.b);
+            push8(cpu.c);
             return;
         // Push Data Onto Stack (d,e)
         case INSTR_PUSHD:
-            push16(cpu.de);
+            push8(cpu.d);
+            push8(cpu.e);
             return;
          // Push Data Onto Stack (h,l)
         case INSTR_PUSHH:
-            push16(cpu.hl);
+            push8(cpu.h);
+            push8(cpu.l);
             return;
          // Push Data Onto Stack (a,f)
         case INSTR_PUSHPSW:
-            push16(cpu.af);
+            push8(cpu.a);
+            push8(cpu.f);
             return;
         // Pop Data Off Stack (b,c)
         case INSTR_POPB:
-            cpu.bc = pop16();
+            cpu.c = pop8();
+            cpu.b = pop8();
             return;
         // Pop Data Off Stack (d,e)
         case INSTR_POPD:
-            cpu.de = pop16();
+            cpu.e = pop8();
+            cpu.d = pop8();
             return;
         // Pop Data Off Stack (h,l)
         case INSTR_POPH:
-            cpu.hl = pop16();
+            cpu.l = pop8();
+            cpu.h = pop8();
             return;
         // Pop Data Off Stack (a,f)
         case INSTR_POPPSW:
-            cpu.af = pop16();
+            cpu.f = pop8();
+            cpu.a = pop8();
             return;
         // Store Accumulator Direct
         case INSTR_STA:
@@ -407,9 +420,12 @@ void cpu_step(void)
             return;
         // Exchange Registers
         case INSTR_XCHG:
-            r = cpu.hl;
-            cpu.hl = cpu.de;
-            cpu.de = r;
+            r = cpu.h;
+            cpu.h = cpu.d;
+            cpu.d = r;
+            r = cpu.l;
+            cpu.l = cpu.e;
+            cpu.e = r;
             return;
         // Exchange Stack
         case INSTR_XTHL:
@@ -422,63 +438,78 @@ void cpu_step(void)
             return;
         // Load SP From H And L
         case INSTR_SPHL:
-            cpu.sp = cpu.hl;
+            cpu.sp = SETH(cpu.sp, cpu.h);
+            cpu.sp = SETL(cpu.sp, cpu.l);
             return;
         // Load Program Counter
         case INSTR_PCHL:
-            cpu.pc = cpu.hl;
+            cpu.pc = SETH(cpu.pc, cpu.h);
+            cpu.pc = SETL(cpu.pc, cpu.l);
             return;
         // Double Add (b,c)
         case INSTR_DADB:
-            r = cpu.hl + cpu.bc;
-            cpu.cy = (r > 0xFFFF);
-            cpu.hl = r;
+            r = COMPHL(cpu.h + cpu.b, cpu.l + cpu.c);
+            cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
+            cpu.h = GETH(r);
+            cpu.l = GETL(r);
             return;
         // Double Add (d,e)
         case INSTR_DADD:
-            r = cpu.hl + cpu.de;
-            cpu.cy = (r > 0xFFFF);
-            cpu.hl = r;
+            r = COMPHL(cpu.h + cpu.d, cpu.l + cpu.e);
+            cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
+            cpu.h = GETH(r);
+            cpu.l = GETL(r);
             return;
          // Double Add (h,l)
         case INSTR_DADH:
-            r = cpu.hl + cpu.hl;
-            cpu.cy = (r > 0xFFFF);
-            cpu.hl = r;
+            r = COMPHL(cpu.h + cpu.h, cpu.l + cpu.l);
+            cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
+            cpu.h = GETH(r);
+            cpu.l = GETL(r);
             return;
          // Double Add (sp)
         case INSTR_DADSP:
-            r = cpu.hl + cpu.sp;
-            cpu.cy = (r > 0xFFFF);
-            cpu.hl = r;
+            r = COMPHL(cpu.h + GETH(cpu.sp), cpu.l + GETL(cpu.sp));
+            cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
+            cpu.h = GETH(r);
+            cpu.l = GETL(r);
             return;
          // Store Accumulator (to (B,C))
         case INSTR_STAXB:
-            mem_write(cpu.bc, cpu.a);
+            mem_write(COMPHL(cpu.b, cpu.c), cpu.a);
             return;
         // Store Accumulator (to (D,E))
         case INSTR_STAXD:
-            mem_write(cpu.de, cpu.a);
+            mem_write(COMPHL(cpu.d, cpu.e), cpu.a);
             return;
         // Load Accumulator (from (B,C))
         case INSTR_LDAXB:
-            cpu.a = mem_read(cpu.bc);
+            cpu.a = mem_read(COMPHL(cpu.b, cpu.c));
             return;
         // Load Accumulator (from (D,E))
         case INSTR_LDAXD:
-            cpu.a = mem_read(cpu.de);
+            cpu.a = mem_read(COMPHL(cpu.d, cpu.e));
             return;
         // Increment Register Pair (b,c)
         case INSTR_INXB:
-            cpu.bc++;
+            r = COMPHL(cpu.b, cpu.c);
+            r++;
+            cpu.b = GETH(r);
+            cpu.c = GETH(r);
             return;
         // Increment Register Pair (d,e)
         case INSTR_INXD:
-            cpu.de++;
+            r = COMPHL(cpu.d, cpu.e);
+            r++;
+            cpu.d = GETH(r);
+            cpu.e = GETH(r);
             return;
          // Increment Register Pair (h,l)
         case INSTR_INXH:
-            cpu.hl++;
+            r = COMPHL(cpu.h, cpu.l);
+            r++;
+            cpu.h = GETH(r);
+            cpu.l = GETH(r);
             return;
          // Increment Register Pair (sp)
         case INSTR_INXSP:
@@ -486,15 +517,24 @@ void cpu_step(void)
             return;
         // Decrement Register Pair (b,c)
         case INSTR_DCXB:
-            cpu.bc--;
+            r = COMPHL(cpu.b, cpu.c);
+            r--;
+            cpu.b = GETH(r);
+            cpu.c = GETH(r);
             return;
         // Decrement Register Pair (d,e)
         case INSTR_DCXD:
-            cpu.de--;
+            r = COMPHL(cpu.d, cpu.e);
+            r--;
+            cpu.d = GETH(r);
+            cpu.e = GETH(r);
             return;
          // Decrement Register Pair (h,l)
         case INSTR_DCXH:
-            cpu.hl--;
+            r = COMPHL(cpu.h, cpu.l);
+            r--;
+            cpu.h = GETH(r);
+            cpu.l = GETH(r);
             return;
          // Decrement Register Pair (sp)
         case INSTR_DCXSP:
@@ -506,17 +546,17 @@ void cpu_step(void)
             return;
         // Set Carry
         case INSTR_STC:
-            cpu.cy = 1;
+            cpu.f = SETBIT(cpu.f, FLAG_CY, 1);
             return;
         // Complement Carry
         case INSTR_CMC:
-            cpu.cy = ~cpu.cy;
+            cpu.f = SETBIT(cpu.f, FLAG_CY, ~GETBIT(cpu.f, FLAG_CY));
             return;
         // Decimal Adjust Accumulator
         case INSTR_DAA:
-            if (cpu.ac || (cpu.a & 0xF) > 9)
+            if (GETBIT(cpu.f, FLAG_AC) || (cpu.a & 0xF) > 9)
                 r += 6;
-            if (cpu.cy || (cpu.a >> 4) > 9)
+            if (GETBIT(cpu.f, FLAG_CY) || (cpu.a >> 4) > 9)
                 r += (6 << 4);
             cpu.a = setflags_sum(cpu.a, r);
             return;
@@ -559,7 +599,7 @@ void cpu_step(void)
             return;
         // ADD Register or Memory To Accumulator With Carry
         case INSTRBITS_ADC:
-            cpu.a = setflags_sum(cpu.a, op_read(OP_2(code) + cpu.cy));
+            cpu.a = setflags_sum(cpu.a, op_read(OP_2(code) + GETBIT(cpu.f, FLAG_CY)));
             return;
         // Subtract Register or Memory From Accumulator
         case INSTRBITS_SUB:
@@ -567,7 +607,7 @@ void cpu_step(void)
             return;
         // Subtract Register or Memory From Accumulator With Borrow
         case INSTRBITS_SBB:
-            cpu.a = setflags_sum(cpu.a, -op_read(OP_2(code)) - cpu.cy);
+            cpu.a = setflags_sum(cpu.a, -op_read(OP_2(code)) - GETBIT(cpu.f, FLAG_CY));
             return;
         // Logical and Register or Memory With Accumulator
         case INSTRBITS_ANA:

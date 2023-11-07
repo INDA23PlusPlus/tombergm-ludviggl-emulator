@@ -15,6 +15,7 @@ addr_t tui_addr;
 #define RST "\x1b[1;0m"
 
 #define REG(x) (prev.x != cpu.x ? HL : ""), cpu.x
+#define FLAG(x) (GETBIT(cpu.f, x) ? HL "1" RST : "0")
 
 void hexdump(addr_t);
 
@@ -31,14 +32,14 @@ void tui_update(void)
     printf(
             "Registers:\n"
             "             S   Z   AC   P   CY\n"
-            "A:    %s0x%02x" RST " \u2502 %s%d" RST " | %s%d" RST " | %s%d" RST "  | %s%d" RST " | %s%d" RST "\n"
+            "A:    %s0x%02x" RST " \u2502 %s" RST " | %s" RST " | %s" RST "  | %s" RST " | %s" RST "\n"
             "B:    %s0x%02x" RST " \u2502 C:    %s0x%02x" RST "\n"
             "D:    %s0x%02x" RST " \u2502 E:    %s0x%02x" RST "\n"
             "H:    %s0x%02x" RST " \u2502 L:    %s0x%02x" RST "\n"
             "SP: %s0x%04x"   RST " \u2502 PC: %s0x%04x"   RST "\n"
             "\n"
             ,
-            REG(a), REG(s), REG(z), REG(ac), REG(p), REG(cy),
+            REG(a), FLAG(FLAG_S), FLAG(FLAG_Z), FLAG(FLAG_AC), FLAG(FLAG_P), FLAG(FLAG_CY),
             REG(b), REG(c),
             REG(d), REG(e),
             REG(h), REG(l),
