@@ -10,7 +10,6 @@ typedef uint16_t addr_t;
 
 // Operands
 #define OP_A   0b111
-#define OP_F   0b1000
 #define OP_B   0b000
 #define OP_C   0b001
 #define OP_D   0b010
@@ -43,7 +42,7 @@ typedef enum
 #define SETL(x, b) (((x) & 0xff00) | (b))
 #define GETH(x) (((x) >> 8) & 0xff)
 #define GETL(x) ((x) & 0xff)
-#define COMPHL(h, l) (((h) << 8) & (l))
+#define COMPHL(h, l) (((h) << 8) | (l))
 
 // Mask out operand from instruction
 #define LOW_OP_MASK  0b11111000

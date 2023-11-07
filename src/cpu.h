@@ -7,7 +7,6 @@ typedef struct {
 
     union {
         byte_t byte_reg[8];
-        addr_t addr_reg[4];
 
         struct {
             byte_t b;
@@ -16,10 +15,12 @@ typedef struct {
             byte_t e;
             byte_t h;
             byte_t l;
+            byte_t __padding;
             byte_t a;
-            byte_t f;
         };
     };
+
+    byte_t f;
 
     addr_t pc;
     addr_t sp;

@@ -4,9 +4,6 @@
 #include "io.h"
 #include "mem.h"
 
-#define BYTE_REG(r) (cpu.byte_reg[( (r) < OP_MEM ? (r) : (r - 1))])
-#define ADDR_REG(r) (cpu.addr_reg[(((r) < OP_MEM ? (r) : (r - 1))) >> 1])
-
 cpu_t cpu;
 
 static byte_t get_code(void)
@@ -69,7 +66,7 @@ static void op_write(byte_t op, byte_t data)
         mem_write(addr, data);
     }
     else
-        BYTE_REG(op) = data;
+        cpu.byte_reg[op] = data;
 }
 
 static byte_t op_read(byte_t op)
@@ -80,7 +77,7 @@ static byte_t op_read(byte_t op)
         return mem_read(addr);
     }
     else
-        return BYTE_REG(op);
+        return cpu.byte_reg[op];
 }
 
 void cpu_step(void)
