@@ -73,7 +73,7 @@ void hexdump(addr_t at)
             printf("0x%04x:    ", addr);
         }
 
-        if (addr == at)
+        if (addr == at || addr == cpu.pc || addr == cpu.sp)
         {
             printf(HL "%02x" RST " ", mem[addr]);
         }
