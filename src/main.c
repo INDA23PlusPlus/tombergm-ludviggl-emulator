@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     while (!cpu.halt)
     {
         tui_update();
+        printf("Press ENTER to step, or type 'q' to quit.\n");
         if (getc(stdin) == 'q') break;
         cpu_step();
     }
