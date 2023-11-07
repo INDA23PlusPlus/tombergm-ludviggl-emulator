@@ -445,28 +445,28 @@ void cpu_step(void)
             return;
         // Double Add (b,c)
         case INSTR_DADB:
-            r = COMPHL(cpu.h + cpu.b, cpu.l + cpu.c);
+            r = COMPHL(cpu.h, cpu.l) + COMPHL(cpu.b, cpu.c);
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
         // Double Add (d,e)
         case INSTR_DADD:
-            r = COMPHL(cpu.h + cpu.d, cpu.l + cpu.e);
+            r = COMPHL(cpu.h, cpu.l) + COMPHL(cpu.d, cpu.e);
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
          // Double Add (h,l)
         case INSTR_DADH:
-            r = COMPHL(cpu.h + cpu.h, cpu.l + cpu.l);
+            r = COMPHL(cpu.h, cpu.l) + COMPHL(cpu.h, cpu.l);
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
          // Double Add (sp)
         case INSTR_DADSP:
-            r = COMPHL(cpu.h + GETH(cpu.sp), cpu.l + GETL(cpu.sp));
+            r = COMPHL(cpu.h, cpu.l) + cpu.sp;
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
