@@ -123,21 +123,21 @@ void cpu_step(void)
             setflags_sum(cpu.a, -get_code());
             return;
         // Rotate Accumulator Left
-        case INSTR_RLC:
+        case INSTR_RAL:
             cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a > 0x7F);
             // Fall-thru
         // Rotate Accumulator Left Through Carry
-        case INSTR_RAL:
+        case INSTR_RLC:
             r = ((cpu.a << 1) | GETBIT(cpu.f, FLAG_CY));
             cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a > 0x7F);
             cpu.a = r;
             return;
         // Rotate Accumulator Right
-        case INSTR_RRC:
+        case INSTR_RAR:
             cpu.f = SETBIT(cpu.f, FLAG_CY, (cpu.a & 1));
             // Fall-thru
         // Rotate Accumulator Right Through Carry
-        case INSTR_RAR:
+        case INSTR_RRC:
             r = ((cpu.a >> 1) | (GETBIT(cpu.f, FLAG_CY) << 7));
             cpu.f = SETBIT(cpu.f, FLAG_CY, cpu.a & 1);
             cpu.a = r;
