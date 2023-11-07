@@ -199,11 +199,11 @@ addr_t disas(char *s, addr_t addr)
             return disas_addr;
         // Input
         case INSTR_IN:
-            sprintf(s, "in");
+            sprintf(s, "in      %i", get_byte());
             return disas_addr;
         // Output
         case INSTR_OUT:
-            sprintf(s, "out");
+            sprintf(s, "out     %i", get_byte());
             return disas_addr;
         // Load Immediate Into Register Pair (b,c)
         case INSTR_LXIB:
