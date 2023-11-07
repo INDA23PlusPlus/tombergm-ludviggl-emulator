@@ -492,21 +492,21 @@ void cpu_step(void)
             r = COMPHL(cpu.b, cpu.c);
             r++;
             cpu.b = GETH(r);
-            cpu.c = GETH(r);
+            cpu.c = GETL(r);
             return;
         // Increment Register Pair (d,e)
         case INSTR_INXD:
             r = COMPHL(cpu.d, cpu.e);
             r++;
             cpu.d = GETH(r);
-            cpu.e = GETH(r);
+            cpu.e = GETL(r);
             return;
          // Increment Register Pair (h,l)
         case INSTR_INXH:
             r = COMPHL(cpu.h, cpu.l);
             r++;
             cpu.h = GETH(r);
-            cpu.l = GETH(r);
+            cpu.l = GETL(r);
             return;
          // Increment Register Pair (sp)
         case INSTR_INXSP:
@@ -517,21 +517,21 @@ void cpu_step(void)
             r = COMPHL(cpu.b, cpu.c);
             r--;
             cpu.b = GETH(r);
-            cpu.c = GETH(r);
+            cpu.c = GETL(r);
             return;
         // Decrement Register Pair (d,e)
         case INSTR_DCXD:
             r = COMPHL(cpu.d, cpu.e);
             r--;
             cpu.d = GETH(r);
-            cpu.e = GETH(r);
+            cpu.e = GETL(r);
             return;
          // Decrement Register Pair (h,l)
         case INSTR_DCXH:
             r = COMPHL(cpu.h, cpu.l);
             r--;
             cpu.h = GETH(r);
-            cpu.l = GETH(r);
+            cpu.l = GETL(r);
             return;
          // Decrement Register Pair (sp)
         case INSTR_DCXSP:
