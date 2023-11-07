@@ -1,9 +1,12 @@
 #include "mem.h"
+#include "tui.h"
+#include "cpu.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
+
     if (argc == 1)
     {
         printf("ERROR: No input file provided\n");
@@ -22,4 +25,11 @@ int main(int argc, char *argv[])
 
     const size_t fsize = fread(mem, sizeof(mem), 1, f);
     (void)fsize;
+
+    while (!cpu.halt)
+    {
+        tui_update();
+        if (getc(stdin) == 'q') break;
+        cpu_step();
+    }
 }
