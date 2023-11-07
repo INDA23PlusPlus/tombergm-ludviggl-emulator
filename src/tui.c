@@ -3,6 +3,7 @@
 #include "io.h"
 #include "cpu.h"
 #include "definitions.h"
+#include "disas.h"
 #include "mem.h"
 #include "buffer.h"
 #include <string.h>
@@ -51,8 +52,38 @@ void tui_update(void)
     printf("Last write:\n");
     hexdump(tui_addr);
 
-    //printf("Program counter:\n");
-    //hexdump(cpu.pc);
+    printf("\nDisassembly:\n");
+    addr_t disas_addr = cpu.pc;
+    for (int i = 0; i < 5; i++)
+    {
+        int n = 0;
+        char disas_buf[32];
+        addr_t next_addr = disas(disas_buf, disas_addr);
+
+        printf("0x%04x:   ", disas_addr);
+
+        if (i == 0)
+        {
+            printf(HL);
+        }
+
+        while (disas_addr != next_addr)
+        {
+            if (n++ != 0)
+            {
+                printf(" ");
+            }
+            printf("%02x", mem[disas_addr++]);
+        }
+
+        while (n < 4)
+        {
+            printf("   ");
+            n++;
+        }
+
+       printf("%s" RST "\n", disas_buf);
+    }
 
     printf("\n\n");
 }
