@@ -29,8 +29,9 @@ int main(int argc, char *argv[])
     for (;;)
     {
         tui_update();
-        printf("Press ENTER to step, or type 'c' to run, 'q' to quit.\n");
+        printf("Press ENTER to step, or type 'c' to run, 'q' to quit, 'mX' to go to address X.\n");
         char c = fgetc(stdin);
+        if (c <= 'Z') c += 'a' - 'A';
         if (c == 'q')
         {
             break;
@@ -41,6 +42,18 @@ int main(int argc, char *argv[])
             {
                 cpu_step();
             }
+        }
+        else if (c == 'm')
+        {
+            char buf[32];
+            int i = 0;
+            while ((c = fgetc(stdin)))
+            {
+                if (c == '\n') break;
+                buf[i++] = c;
+            }
+            buf[i] = '\0';
+            tui_addr = strtol(buf, NULL, 16);
         }
         else
         {
