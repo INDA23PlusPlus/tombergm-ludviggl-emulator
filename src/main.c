@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
             {
                 cpu_step();
             }
+            freerun = 0;
         }
         else if (c == 'm')
         {
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
 
                 if (cpu.halt || !freerun)
                 {
+                    freerun = 0;
                     break;
                 }
                 else
