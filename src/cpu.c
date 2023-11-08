@@ -8,7 +8,7 @@ cpu_t cpu;
 
 static byte_t get_code(void)
 {
-    return mem_read(cpu.pc++);
+    return mem[cpu.pc++];
 }
 
 static void push8(byte_t data)

@@ -48,7 +48,7 @@ void tui_update(void)
 
     prev = cpu;
 
-    printf("Last write:\n");
+    printf("Last memory access:\n");
     hexdump(tui_addr);
 
     printf("\nDisassembly:\n");

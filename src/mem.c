@@ -5,7 +5,7 @@ byte_t mem[ADDRSPACE_SIZE];
 
 byte_t mem_read(addr_t addr)
 {
-    //tui_addr = addr;
+    tui_addr = addr;
     return mem[addr];
 }
 
