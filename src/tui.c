@@ -36,14 +36,14 @@ void tui_update(void)
             "B:    %s0x%02x" RST " \u2502 C:    %s0x%02x" RST "\n"
             "D:    %s0x%02x" RST " \u2502 E:    %s0x%02x" RST "\n"
             "H:    %s0x%02x" RST " \u2502 L:    %s0x%02x" RST "\n"
-            "SP: %s0x%04x"   RST " \u2502 PC: %s0x%04x"   RST "\n"
+            "SP: %s0x%04x"   RST " \u2502 PC: %s0x%04x"   RST " %s\n"
             "\n"
             ,
             REG(a), FLAG(FLAG_S), FLAG(FLAG_Z), FLAG(FLAG_AC), FLAG(FLAG_P), FLAG(FLAG_CY),
             REG(b), REG(c),
             REG(d), REG(e),
             REG(h), REG(l),
-            REG(sp), REG(pc)
+            REG(sp), REG(pc), cpu.halt ? HL "HALT" RST : ""
     );
 
     prev = cpu;
