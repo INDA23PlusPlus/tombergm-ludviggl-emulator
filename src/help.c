@@ -14,6 +14,7 @@ void showhelp(void)
     printf(
             "Commands:\n"
             "            <enter>            Step\n"
+            "            n  <enter>         Step over\n"
             "            c  <enter>         Run\n"
             "            r  <enter>         Reset\n"
             "            a  <enter>         Auto-step\n"

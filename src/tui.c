@@ -17,7 +17,7 @@ addr_t tui_addr;
 #define REG(x) (prev.x != cpu.x ? HL : ""), cpu.x
 #define FLAG(x) (GETBIT(cpu.f, x) ? HL "1" RST : "0")
 
-void hexdump(addr_t);
+static void hexdump(addr_t);
 
 void tui_update(void)
 {
@@ -87,7 +87,7 @@ void tui_update(void)
     printf("\n");
 }
 
-void hexdump(addr_t at)
+static void hexdump(addr_t at)
 {
     int start = at & 0xfff0;
     start -= 8 * MEM_ROWS;

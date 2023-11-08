@@ -1,57 +1,5 @@
-	lxi	sp, 4096
-
-	lxi	bc, 0
-	lxi	de, 1
-
-fib_loop:
-	call	printd
-	push	de
-	push	bc
-	pop	hl
-	dad	de
-	xchg
-	pop	bc
-	jnc	fib_loop
-	call	printd
-
-	hlt
-
-	; function: printd
-	; prints the numer stored in bc
-printd:
-	push	psw
-	push	bc
-	push	de
-	push	hl
-
-	xra	a
-	mov	h, a
-	adi	10	; '\n'
-	push	psw
-	inr	h
-
-printd_loop_1_:
-	lxi	de, 10
-	call	div
-	mov	a, e
-	adi	48	; '0'
-	push	psw
-	inr	h
-	mov	a, b
-	ora	c
-	jnz	printd_loop_1_
-
-printd_loop_2_:
-	pop	psw
-	out	0
-	dcr	hl
-	jnz	printd_loop_2_
-
-	pop	hl
-	pop	de
-	pop	bc
-	pop	psw
-	ret
+#ifndef DIV_S
+#define DIV_S
 
 	; function: div
 	; performs integer division of bc by de
@@ -124,3 +72,5 @@ div_done_:
 	pop	hl
 	pop	psw
 	ret
+
+#endif

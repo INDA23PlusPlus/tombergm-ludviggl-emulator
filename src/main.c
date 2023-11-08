@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include "cpu.h"
+#include "disas.h"
+#include "help.h"
 #include "mem.h"
 #include "tui.h"
-#include "cpu.h"
-#include "help.h"
 
-int freerun = 0;
+static int freerun = 0;
 
-void sighandler(int sig)
+static void sighandler(int sig)
 {
     (void)sig;
     if (freerun)
@@ -51,9 +52,19 @@ int main(int argc, char *argv[])
         tui_update();
         printf("Press <h> <enter> to show a list of commands.\n");
         char c = fgetc(stdin);
-        if (c <= 'Z') c += 'a' - 'A';
+        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
 
-        if (c == 'q')
+        if (c == 'n')
+        {
+            addr_t bp = disas(NULL, cpu.pc);
+            freerun = 1;
+            while (!cpu.halt && freerun && cpu.pc != bp)
+            {
+                cpu_step();
+            }
+            freerun = 0;
+        }
+        else if (c == 'q')
         {
             break;
         }
@@ -108,6 +119,11 @@ int main(int argc, char *argv[])
         else
         {
             cpu_step();
+        }
+
+        while (c != '\n')
+        {
+            c = fgetc(stdin);
         }
     }
 

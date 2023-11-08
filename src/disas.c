@@ -39,6 +39,13 @@ addr_t disas(char *s, addr_t addr)
 
     const byte_t code = get_byte();
 
+    char disas_buf[32];
+
+    if (s == NULL)
+    {
+        s = disas_buf;
+    }
+
     switch (code)
     {
         // Add Immediate To Accumulator
