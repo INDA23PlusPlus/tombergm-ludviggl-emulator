@@ -1,12 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 #include "mem.h"
 #include "tui.h"
 #include "cpu.h"
 
+int freerun = 0;
+
+void sighandler(int sig)
+{
+    (void)sig;
+    if (freerun)
+    {
+        freerun = 0;
+    }
+    else
+    {
+        exit(0);
+    }
+}
+
 int main(int argc, char *argv[])
 {
+
+    signal(SIGINT, sighandler);
 
     if (argc == 1)
     {
@@ -40,7 +58,8 @@ int main(int argc, char *argv[])
         }
         else if (c == 'c')
         {
-            while (!cpu.halt)
+            freerun = 1;
+            while (!cpu.halt && freerun)
             {
                 cpu_step();
             }
@@ -59,11 +78,12 @@ int main(int argc, char *argv[])
         }
         else if (c == 'a')
         {
-            for (;;)
+            freerun = 1;
+            while (freerun)
             {
                 cpu_step();
 
-                if (cpu.halt)
+                if (cpu.halt || !freerun)
                 {
                     break;
                 }
