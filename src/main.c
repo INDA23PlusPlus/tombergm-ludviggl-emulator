@@ -8,7 +8,8 @@
 #include "mem.h"
 #include "tui.h"
 
-static int freerun = 0;
+int freerun = 0;
+int break_on_nl = 0;
 
 static void sighandler(int sig)
 {
@@ -64,6 +65,25 @@ int main(int argc, char *argv[])
             }
             freerun = 0;
         }
+        else if (c == 'f')
+        {
+            addr_t sp_min = cpu.sp;
+            freerun = 1;
+            while (!cpu.halt && freerun)
+            {
+                addr_t sp = cpu.sp;
+                addr_t sp_b = sp;
+                addr_t pc_b = 0;
+                pc_b = SETL(pc_b, mem[sp_b++]);
+                pc_b = SETH(pc_b, mem[sp_b++]);
+                cpu_step();
+                if (sp >= sp_min && cpu.sp == sp_b && cpu.pc == pc_b)
+                {
+                    break;
+                }
+            }
+            freerun = 0;
+        }
         else if (c == 'q')
         {
             break;
@@ -76,6 +96,17 @@ int main(int argc, char *argv[])
                 cpu_step();
             }
             freerun = 0;
+        }
+        else if (c == 'o')
+        {
+            freerun = 1;
+            break_on_nl = 1;
+            while (!cpu.halt && freerun)
+            {
+                cpu_step();
+            }
+            freerun = 0;
+            break_on_nl = 0;
         }
         else if (c == 'm')
         {

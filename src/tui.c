@@ -59,7 +59,7 @@ void tui_update(void)
         char disas_buf[32];
         addr_t next_addr = disas(disas_buf, disas_addr);
 
-        printf("0x%04x:   ", disas_addr);
+        printf("0x%04x:    ", disas_addr);
 
         if (i == 0)
         {

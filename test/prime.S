@@ -35,9 +35,14 @@ is_prime:
 
 	lxi	de, 3
 is_prime_loop_:
+	mov	a, l
+	sub	e
+	mov	a, h
+	sbb	d
+	jc	is_prime_done_
+
 	push	bc
 	push	de
-
 	call	div
 	mov	a, d
 	ora	e
@@ -55,11 +60,8 @@ is_prime_nz_:
 	pop	bc
 	inx	de
 	inx	de
-	mov	a, l
-	sub	e
-	mov	a, h
-	sbb	d
-	jnc	is_prime_loop_
+	jmp	is_prime_loop_
+is_prime_done_:
 
 	pop	de
 	pop	bc

@@ -14,7 +14,9 @@ void showhelp(void)
             "Commands:\n"
             "            <enter>            Step\n"
             "            n  <enter>         Step over\n"
+            "            f  <enter>         Step out\n"
             "            c  <enter>         Run\n"
+            "            o  <enter>         Run until next output line\n"
             "            r  <enter>         Reset\n"
             "            a  <enter>         Auto-step\n"
             "            mX <enter>         Show memory address X\n"
@@ -24,6 +26,6 @@ void showhelp(void)
             "\n"
             "Press <enter> to close this message.\n"
           );
-    fgetc(stdin);
-    fgetc(stdin);
+    while (fgetc(stdin) != '\n')
+        ;
 }
