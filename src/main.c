@@ -1,8 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "mem.h"
 #include "tui.h"
 #include "cpu.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
@@ -29,9 +30,10 @@ int main(int argc, char *argv[])
     for (;;)
     {
         tui_update();
-        printf("Press ENTER to step, or type 'c' to run, 'q' to quit, 'mX' to go to address X.\n");
+        printf("Press ENTER to step, or type 'c' to run, 'a' to autostep, 'q' to quit, 'mX' to go to address X.\n");
         char c = fgetc(stdin);
         if (c <= 'Z') c += 'a' - 'A';
+
         if (c == 'q')
         {
             break;
@@ -54,6 +56,23 @@ int main(int argc, char *argv[])
             }
             buf[i] = '\0';
             tui_addr = strtol(buf, NULL, 16);
+        }
+        else if (c == 'a')
+        {
+            for (;;)
+            {
+                cpu_step();
+
+                if (cpu.halt)
+                {
+                    break;
+                }
+                else
+                {
+                    tui_update();
+                    usleep(20000);
+                }
+            }
         }
         else
         {
