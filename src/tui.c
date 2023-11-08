@@ -84,7 +84,7 @@ void tui_update(void)
        printf("%s" RST "\n", disas_buf);
     }
 
-    printf("\n\n");
+    printf("\n");
 }
 
 void hexdump(addr_t at)

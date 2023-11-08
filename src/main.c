@@ -5,6 +5,7 @@
 #include "mem.h"
 #include "tui.h"
 #include "cpu.h"
+#include "help.h"
 
 int freerun = 0;
 
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
     for (;;)
     {
         tui_update();
-        printf("Press ENTER to step, or type 'c' to run, 'a' to autostep, 'q' to quit, 'r' to reset, 'mX' to go to address X.\n");
+        printf("Press <h> <enter> to show a list of commands.\n");
         char c = fgetc(stdin);
         if (c <= 'Z') c += 'a' - 'A';
 
@@ -99,6 +100,10 @@ int main(int argc, char *argv[])
         else if (c == 'r')
         {
             cpu = (cpu_t) { 0 };
+        }
+        else if (c == 'h')
+        {
+            showhelp();
         }
         else
         {
