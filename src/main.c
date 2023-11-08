@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     for (;;)
     {
         tui_update();
-        printf("Press ENTER to step, or type 'c' to run, 'a' to autostep, 'q' to quit, 'mX' to go to address X.\n");
+        printf("Press ENTER to step, or type 'c' to run, 'a' to autostep, 'q' to quit, 'r' to reset, 'mX' to go to address X.\n");
         char c = fgetc(stdin);
         if (c <= 'Z') c += 'a' - 'A';
 
@@ -73,6 +73,10 @@ int main(int argc, char *argv[])
                     usleep(20000);
                 }
             }
+        }
+        else if (c == 'r')
+        {
+            cpu = (cpu_t) { 0 };
         }
         else
         {
