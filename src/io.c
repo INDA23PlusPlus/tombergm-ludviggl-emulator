@@ -1,6 +1,6 @@
-#include "io.h"
-#include "buffer.h"
 #include <stdio.h>
+#include "buffer.h"
+#include "io.h"
 
 static buf_t buf = { 0 };
 

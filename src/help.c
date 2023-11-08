@@ -1,6 +1,5 @@
-
-#include "help.h"
 #include <stdio.h>
+#include "help.h"
 
 void showhelp(void)
 {

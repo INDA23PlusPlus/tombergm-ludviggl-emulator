@@ -2,7 +2,7 @@ CC=gcc
 ASM8080=asm8080
 CFLAGS=-Wall -Wextra
 SRC=$(wildcard src/*.c)
-TEST_SRC=test/fib.S test/helloworld.S
+TEST_SRC=test/helloworld.S test/fib.S test/prime.S
 TEST_ASM=$(TEST_SRC:test/%.S=build/%.asm)
 TEST_BIN=$(TEST_SRC:test/%.S=build/%.bin)
 OUTPUT=build/8080
