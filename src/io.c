@@ -15,12 +15,18 @@ byte_t io_read(byte_t port)
 
 void io_write(byte_t port, byte_t data)
 {
-    (void)port;
-    buf_putc(&buf, data);
+    switch (port) {
+    case 0:
+        buf_putc(&buf, data);
 
-    if (break_on_nl && data == '\n')
-    {
+        if (break_on_nl && data == '\n')
+        {
+            freerun = 0;
+        }
+        break;
+    case 1:
         freerun = 0;
+        break;
     }
 }
 
