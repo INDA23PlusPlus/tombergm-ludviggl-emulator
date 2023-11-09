@@ -183,14 +183,14 @@ void cpu_step(void)
             if (GETBIT(cpu.f, FLAG_S))
                 cpu.pc = r;
             return;
-         // Jump If Positive
+        // Jump If Positive
         case INSTR_JP:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
             if (!GETBIT(cpu.f, FLAG_S))
                 cpu.pc = r;
             return;
-       // Jump If Parity Even
+        // Jump If Parity Even
         case INSTR_JPE:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
@@ -261,7 +261,7 @@ void cpu_step(void)
                 cpu.pc = r;
             }
             return;
-         // Call If Plus
+        // Call If Plus
         case INSTR_CP:
             r = SETL(r, get_code());
             r = SETH(r, get_code());
@@ -320,7 +320,7 @@ void cpu_step(void)
             if (GETBIT(cpu.f, FLAG_S))
                 cpu.pc = pop16();
             return;
-         // Return If Plus
+        // Return If Plus
         case INSTR_RP:
             if (!GETBIT(cpu.f, FLAG_S))
                 cpu.pc = pop16();
@@ -363,7 +363,7 @@ void cpu_step(void)
             cpu.sp = SETL(cpu.sp, get_code());
             cpu.sp = SETH(cpu.sp, get_code());
             return;
-         // Push Data Onto Stack (b,c)
+        // Push Data Onto Stack (b,c)
         case INSTR_PUSHB:
             push8(cpu.b);
             push8(cpu.c);
@@ -373,12 +373,12 @@ void cpu_step(void)
             push8(cpu.d);
             push8(cpu.e);
             return;
-         // Push Data Onto Stack (h,l)
+        // Push Data Onto Stack (h,l)
         case INSTR_PUSHH:
             push8(cpu.h);
             push8(cpu.l);
             return;
-         // Push Data Onto Stack (a,f)
+        // Push Data Onto Stack (a,f)
         case INSTR_PUSHPSW:
             push8(cpu.a);
             push8(cpu.f);
@@ -457,33 +457,33 @@ void cpu_step(void)
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
-         // Double Add (h,l)
+        // Double Add (h,l)
         case INSTR_DADH:
             r = COMPHL(cpu.h, cpu.l) + COMPHL(cpu.h, cpu.l);
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
-         // Double Add (sp)
+        // Double Add (sp)
         case INSTR_DADSP:
             r = COMPHL(cpu.h, cpu.l) + cpu.sp;
             cpu.f = SETBIT(cpu.f, FLAG_CY, r > 0xFFFF);
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
-         // Store Accumulator (to (B,C))
+        // Store Accumulator (to (b,c))
         case INSTR_STAXB:
             mem_write(COMPHL(cpu.b, cpu.c), cpu.a);
             return;
-        // Store Accumulator (to (D,E))
+        // Store Accumulator (to (d,e))
         case INSTR_STAXD:
             mem_write(COMPHL(cpu.d, cpu.e), cpu.a);
             return;
-        // Load Accumulator (from (B,C))
+        // Load Accumulator (from (b,c))
         case INSTR_LDAXB:
             cpu.a = mem_read(COMPHL(cpu.b, cpu.c));
             return;
-        // Load Accumulator (from (D,E))
+        // Load Accumulator (from (d,e))
         case INSTR_LDAXD:
             cpu.a = mem_read(COMPHL(cpu.d, cpu.e));
             return;
@@ -501,14 +501,14 @@ void cpu_step(void)
             cpu.d = GETH(r);
             cpu.e = GETL(r);
             return;
-         // Increment Register Pair (h,l)
+        // Increment Register Pair (h,l)
         case INSTR_INXH:
             r = COMPHL(cpu.h, cpu.l);
             r++;
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
-         // Increment Register Pair (sp)
+        // Increment Register Pair (sp)
         case INSTR_INXSP:
             cpu.sp++;
             return;
@@ -526,18 +526,18 @@ void cpu_step(void)
             cpu.d = GETH(r);
             cpu.e = GETL(r);
             return;
-         // Decrement Register Pair (h,l)
+        // Decrement Register Pair (h,l)
         case INSTR_DCXH:
             r = COMPHL(cpu.h, cpu.l);
             r--;
             cpu.h = GETH(r);
             cpu.l = GETL(r);
             return;
-         // Decrement Register Pair (sp)
+        // Decrement Register Pair (sp)
         case INSTR_DCXSP:
             cpu.sp--;
             return;
-         // Complement Accumulator
+        // Complement Accumulator
         case INSTR_CMA:
             cpu.a = ~cpu.a;
             return;
@@ -615,11 +615,11 @@ void cpu_step(void)
             // Affects AC for some reason
             cpu.a = setflags_sum(cpu.a ^ op_read(OP_2(code)), 0);
             return;
-         // Logical or Register or Memory With Accumulator
+        // Logical or Register or Memory With Accumulator
         case INSTRBITS_ORA:
             cpu.a = setflags(cpu.a | op_read(OP_2(code)));
             return;
-       // Compare Register or Memory With Accumulator
+        // Compare Register or Memory With Accumulator
         case INSTRBITS_CMP:
             setflags_sum(cpu.a, -op_read(OP_2(code)));
             return;

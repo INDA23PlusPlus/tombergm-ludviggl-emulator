@@ -120,11 +120,11 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_JM:
             sprintf(s, "jm      0x%04x", get_word());
             return disas_addr;
-         // Jump If Positive
+        // Jump If Positive
         case INSTR_JP:
             sprintf(s, "jp      0x%04x", get_word());
             return disas_addr;
-       // Jump If Parity Even
+        // Jump If Parity Even
         case INSTR_JPE:
             sprintf(s, "jpe     0x%04x", get_word());
             return disas_addr;
@@ -156,7 +156,7 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_CM:
             sprintf(s, "cm      0x%04x", get_word());
             return disas_addr;
-         // Call If Plus
+        // Call If Plus
         case INSTR_CP:
             sprintf(s, "cp      0x%04x", get_word());
             return disas_addr;
@@ -192,7 +192,7 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_RM:
             sprintf(s, "rm");
             return disas_addr;
-         // Return If Plus
+        // Return If Plus
         case INSTR_RP:
             sprintf(s, "rp");
             return disas_addr;
@@ -228,7 +228,7 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_LXISP:
             sprintf(s, "lxi     sp, %i", get_word());
             return disas_addr;
-         // Push Data Onto Stack (b,c)
+        // Push Data Onto Stack (b,c)
         case INSTR_PUSHB:
             sprintf(s, "push    bc");
             return disas_addr;
@@ -236,11 +236,11 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_PUSHD:
             sprintf(s, "push    de");
             return disas_addr;
-         // Push Data Onto Stack (h,l)
+        // Push Data Onto Stack (h,l)
         case INSTR_PUSHH:
             sprintf(s, "push    hl");
             return disas_addr;
-         // Push Data Onto Stack (a,f)
+        // Push Data Onto Stack (a,f)
         case INSTR_PUSHPSW:
             sprintf(s, "push    psw");
             return disas_addr;
@@ -292,27 +292,27 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_DADD:
             sprintf(s, "dad     de");
             return disas_addr;
-         // Double Add (h,l)
+        // Double Add (h,l)
         case INSTR_DADH:
             sprintf(s, "dad     hl");
             return disas_addr;
-         // Double Add (sp)
+        // Double Add (sp)
         case INSTR_DADSP:
             sprintf(s, "dad     sp");
             return disas_addr;
-         // Store Accumulator (to (B,C))
+        // Store Accumulator (to (b,c))
         case INSTR_STAXB:
             sprintf(s, "stax    bc");
             return disas_addr;
-        // Store Accumulator (to (D,E))
+        // Store Accumulator (to (d,e))
         case INSTR_STAXD:
             sprintf(s, "stax    de");
             return disas_addr;
-        // Load Accumulator (from (B,C))
+        // Load Accumulator (from (b,c))
         case INSTR_LDAXB:
             sprintf(s, "ldax    bc");
             return disas_addr;
-        // Load Accumulator (from (D,E))
+        // Load Accumulator (from (d,e))
         case INSTR_LDAXD:
             sprintf(s, "ldax    de");
             return disas_addr;
@@ -324,11 +324,11 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_INXD:
             sprintf(s, "inx     de");
             return disas_addr;
-         // Increment Register Pair (h,l)
+        // Increment Register Pair (h,l)
         case INSTR_INXH:
             sprintf(s, "inx     hl");
             return disas_addr;
-         // Increment Register Pair (sp)
+        // Increment Register Pair (sp)
         case INSTR_INXSP:
             sprintf(s, "inx     sp");
             return disas_addr;
@@ -340,15 +340,15 @@ addr_t disas(char *s, addr_t addr)
         case INSTR_DCXD:
             sprintf(s, "dcx     de");
             return disas_addr;
-         // Decrement Register Pair (h,l)
+        // Decrement Register Pair (h,l)
         case INSTR_DCXH:
             sprintf(s, "dcx     hl");
             return disas_addr;
-         // Decrement Register Pair (sp)
+        // Decrement Register Pair (sp)
         case INSTR_DCXSP:
             sprintf(s, "dcx     sp");
             return disas_addr;
-         // Complement Accumulator
+        // Complement Accumulator
         case INSTR_CMA:
             sprintf(s, "cma");
             return disas_addr;
@@ -416,11 +416,11 @@ addr_t disas(char *s, addr_t addr)
         case INSTRBITS_XRA:
             sprintf(s, "xra     %s", op_str(OP_2(code)));
             return disas_addr;
-         // Logical or Register or Memory With Accumulator
+        // Logical or Register or Memory With Accumulator
         case INSTRBITS_ORA:
             sprintf(s, "ora     %s", op_str(OP_2(code)));
             return disas_addr;
-       // Compare Register or Memory With Accumulator
+        // Compare Register or Memory With Accumulator
         case INSTRBITS_CMP:
             sprintf(s, "cmp     %s", op_str(OP_2(code)));
             return disas_addr;
